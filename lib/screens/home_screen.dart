@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:github_repo_explorer/screens/search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,10 +12,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = const [
-    _PlaceholderScreen(
-      title: 'Search',
-      icon: Icons.search,
-    ),
+    SearchScreen(),
     _PlaceholderScreen(
       title: 'Favourites',
       icon: Icons.favorite_border,

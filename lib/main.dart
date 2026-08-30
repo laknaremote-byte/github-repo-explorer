@@ -1,9 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:github_repo_explorer/providers/search_provider.dart';
 import 'package:github_repo_explorer/screens/home_screen.dart';
+import 'package:github_repo_explorer/services/github_api_service.dart';
 import 'package:github_repo_explorer/theme.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const GithubRepoExplorerApp());
+  final githubApiService = GithubApiService();
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => SearchProvider(
+            apiService: githubApiService,
+          ),
+        ),
+      ],
+      child: const GithubRepoExplorerApp(),
+    ),
+  );
 }
 
 class GithubRepoExplorerApp extends StatelessWidget {
