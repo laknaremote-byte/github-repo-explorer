@@ -13,10 +13,19 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _scrollController.addListener(_onScroll);
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -24,6 +33,18 @@ class _SearchScreenState extends State<SearchScreen> {
     context.read<SearchProvider>().search(
           _searchController.text,
         );
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) {
+      return;
+    }
+
+    final position = _scrollController.position;
+
+    if (position.pixels >= position.maxScrollExtent - 300) {
+      context.read<SearchProvider>().loadMore();
+    }
   }
 
   @override
@@ -120,13 +141,25 @@ class _SearchScreenState extends State<SearchScreen> {
 
                   case SearchStatus.loaded:
                     return ListView.builder(
+                      controller: _scrollController,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                       ),
-                      itemCount: provider.repositories.length,
+                      itemCount: provider.repositories.length +
+                        (provider.isLoadingMore ? 1 : 0),
                       itemBuilder: (context, index) {
+                        if (index == provider.repositories.length) {
+                          return const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
+                        final repository = provider.repositories[index];
+
                         return RepositoryCard(
-                          repository: provider.repositories[index],
+                          repository: repository,
                         );
                       },
                     );
