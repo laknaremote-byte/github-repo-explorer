@@ -54,7 +54,20 @@ class _SearchScreenState extends State<SearchScreen> {
                 switch (provider.status) {
                   case SearchStatus.idle:
                     return const Center(
-                      child: Text('Search for a GitHub repository'),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search,
+                            size: 48,
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'Search GitHub repositories',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
                     );
 
                   case SearchStatus.loading:
@@ -64,14 +77,44 @@ class _SearchScreenState extends State<SearchScreen> {
 
                   case SearchStatus.empty:
                     return const Center(
-                      child: Text('No repositories found'),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 48,
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'No repositories found',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
                     );
 
                   case SearchStatus.error:
                     return Center(
-                      child: Text(
-                        provider.errorMessage ??
-                            'Something went wrong.',
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            size: 48,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            provider.errorMessage ?? 'Something went wrong',
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          FilledButton(
+                            onPressed: () {
+                              provider.search(provider.query);
+                            },
+                            child: const Text('Retry'),
+                          ),
+                        ],
                       ),
                     );
 

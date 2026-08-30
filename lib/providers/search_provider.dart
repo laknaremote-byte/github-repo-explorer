@@ -51,6 +51,7 @@ class SearchProvider extends ChangeNotifier {
     }
 
     _query = trimmedQuery;
+    _repositories = [];
     _status = SearchStatus.loading;
     _errorMessage = null;
     notifyListeners();
