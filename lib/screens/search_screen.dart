@@ -38,8 +38,7 @@ class _SearchScreenState extends State<SearchScreen> {
             padding: const EdgeInsets.all(16),
             child: TextField(
               controller: _searchController,
-              textInputAction: TextInputAction.search,
-              onSubmitted: (_) => _search(),
+              onChanged: (_) => _search(),
               decoration: InputDecoration(
                 hintText: 'Search repositories',
                 prefixIcon: const Icon(Icons.search),

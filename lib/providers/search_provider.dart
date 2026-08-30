@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../models/repository.dart';
@@ -12,6 +14,8 @@ enum SearchStatus {
 }
 
 class SearchProvider extends ChangeNotifier {
+  Timer? _debounceTimer;
+  
   SearchProvider({
     required GithubApiService apiService,
   }) : _apiService = apiService;
@@ -32,8 +36,10 @@ class SearchProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get hasMore => _hasMore;
 
-  Future<void> search(String query) async {
+  void search(String query) {
     final trimmedQuery = query.trim();
+
+    _debounceTimer?.cancel();
 
     if (trimmedQuery.isEmpty) {
       _repositories = [];
@@ -45,15 +51,23 @@ class SearchProvider extends ChangeNotifier {
     }
 
     _query = trimmedQuery;
-    _currentPage = 1;
-    _hasMore = true;
     _status = SearchStatus.loading;
     _errorMessage = null;
     notifyListeners();
 
+    _debounceTimer = Timer(
+      const Duration(milliseconds: 400),
+      () => _performSearch(trimmedQuery),
+    );
+  }
+
+  Future<void> _performSearch(String query) async {
+    _currentPage = 1;
+    _hasMore = true;
+
     try {
       final results = await _apiService.searchRepositories(
-        query: _query,
+        query: query,
         page: _currentPage,
       );
 
@@ -68,5 +82,11 @@ class SearchProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
   }
 }
