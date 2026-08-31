@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:github_repo_explorer/services/github_exception.dart';
 import 'package:github_repo_explorer/services/local_storage_service.dart';
 
 import '../models/repository.dart';
@@ -95,18 +96,26 @@ class SearchProvider extends ChangeNotifier {
       _status = results.isEmpty
           ? SearchStatus.empty
           : SearchStatus.loaded;
-    } catch (error) {
-        final cachedResults =
-            await _storageService.loadLastSearchResults();
+    } on GithubException catch (error) {
+        if (error.type == GithubErrorType.network) {
+          final cachedResults =
+              await _storageService.loadLastSearchResults();
 
-        if (cachedResults.isNotEmpty) {
-          _repositories = cachedResults;
-          _isOffline = true;
-          _status = SearchStatus.loaded;
+          if (cachedResults.isNotEmpty) {
+            _repositories = cachedResults;
+            _isOffline = true;
+            _status = SearchStatus.loaded;
+          } else {
+            _status = SearchStatus.error;
+            _errorMessage = error.message;
+          }
         } else {
           _status = SearchStatus.error;
-          _errorMessage = 'Unable to load repositories.';
+          _errorMessage = error.message;
         }
+      } catch (_) {
+        _status = SearchStatus.error;
+        _errorMessage = 'Something went wrong. Please try again.';
       }
 
     notifyListeners();

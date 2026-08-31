@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:github_repo_explorer/models/issue.dart';
+import 'package:github_repo_explorer/services/github_exception.dart';
 
 import '../models/repository.dart';
 
@@ -11,10 +12,11 @@ class GithubApiService {
   static const _baseUrl = 'https://api.github.com';
 
   Future<List<Repository>> searchRepositories({
-    required String query,
-    int page = 1,
-    int perPage = 20,
-  }) async {
+  required String query,
+  int page = 1,
+  int perPage = 20,
+}) async {
+  try {
     final response = await _dio.get(
       '$_baseUrl/search/repositories',
       queryParameters: {
@@ -33,7 +35,36 @@ class GithubApiService {
           ),
         )
         .toList();
+  } on DioException catch (error) {
+    if (error.response?.statusCode == 403 &&
+        error.response?.headers.value('x-ratelimit-remaining') == '0') {
+      throw const GithubException(
+        type: GithubErrorType.rateLimit,
+        message: 'GitHub API rate limit reached.',
+      );
+    }
+
+    if (error.type == DioExceptionType.connectionError ||
+        error.type == DioExceptionType.connectionTimeout ||
+        error.type == DioExceptionType.receiveTimeout ||
+        error.type == DioExceptionType.sendTimeout) {
+      throw const GithubException(
+        type: GithubErrorType.network,
+        message: 'Unable to connect to GitHub.',
+      );
+    }
+
+    throw const GithubException(
+      type: GithubErrorType.unexpected,
+      message: 'Something went wrong. Please try again.',
+    );
+  } catch (_) {
+    throw const GithubException(
+      type: GithubErrorType.unexpected,
+      message: 'Something went wrong. Please try again.',
+    );
   }
+}
 
   Future<List<Issue>> getOpenIssues({
   required String owner,
