@@ -50,6 +50,7 @@ class SearchProvider extends ChangeNotifier {
   bool get isOffline => _isOffline;
 
 
+  /// Searches repositories with a short debounce.
   void search(String query) {
     final trimmedQuery = query.trim();
 
@@ -71,12 +72,14 @@ class SearchProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
+    // Debounce to avoid an API call for every keystroke.
     _debounceTimer = Timer(
       const Duration(milliseconds: 400),
       () => _performSearch(trimmedQuery),
     );
   }
 
+  /// Performs the repository search and handles offline fallback.
   Future<void> _performSearch(String query) async {
     _currentPage = 1;
     _hasMore = true;
@@ -89,6 +92,7 @@ class SearchProvider extends ChangeNotifier {
 
       _repositories = results;
 
+      // Cache only successful search results for offline use.
       await _storageService.saveLastSearchResults(results);
 
       _isOffline = false;
@@ -98,6 +102,7 @@ class SearchProvider extends ChangeNotifier {
           : SearchStatus.loaded;
     } on GithubException catch (error) {
         if (error.type == GithubErrorType.network) {
+          // Fall back to cached results when the network is unavailable.
           final cachedResults =
               await _storageService.loadLastSearchResults();
 
@@ -121,6 +126,7 @@ class SearchProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Loads the next page and appends it to the current results.
   Future<void> loadMore() async {
     if (_isLoadingMore || !_hasMore || _query.isEmpty) {
       return;
@@ -137,6 +143,7 @@ class SearchProvider extends ChangeNotifier {
         page: nextPage,
       );
 
+      // Append the next page to the existing results.
       _repositories.addAll(results);
       _currentPage = nextPage;
       _hasMore = results.length == _pageSize;
@@ -148,6 +155,7 @@ class SearchProvider extends ChangeNotifier {
     }
   }
 
+  /// Loads cached results when the app starts offline.
   Future<void> loadCachedResultsIfOffline() async {
     final connectivityResults =
         await _connectivity.checkConnectivity();
@@ -160,6 +168,7 @@ class SearchProvider extends ChangeNotifier {
       return;
     }
 
+    // Show the last successful search when starting offline.
     final cachedResults =
         await _storageService.loadLastSearchResults();
 

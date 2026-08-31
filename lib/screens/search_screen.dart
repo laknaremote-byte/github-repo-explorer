@@ -159,6 +159,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,
                             ),
+                            // Load the next page before reaching the end.
                             itemCount: provider.repositories.length +
                                 (provider.isLoadingMore ? 1 : 0),
                             itemBuilder: (context, index) {

@@ -8,6 +8,7 @@ class LocalStorageService {
   static const String _favouritesKey = 'favourite_repositories';
   static const String _lastSearchKey = 'last_search_results';
 
+  /// Saves favourite repositories locally.
   Future<void> saveFavourites(
     List<Repository> repositories,
   ) async {
@@ -23,6 +24,7 @@ class LocalStorageService {
     );
   }
 
+   /// Loads favourite repositories from local storage.
   Future<List<Repository>> loadFavourites() async {
     final preferences = await SharedPreferences.getInstance();
 
@@ -43,6 +45,7 @@ class LocalStorageService {
         .toList();
   }
 
+  /// Caches the latest successful search results.
   Future<void> saveLastSearchResults(
   List<Repository> repositories,
     ) async {
@@ -58,6 +61,7 @@ class LocalStorageService {
       );
     }
 
+  /// Loads the cached search results for offline use.
   Future<List<Repository>> loadLastSearchResults() async {
     final preferences = await SharedPreferences.getInstance();
 

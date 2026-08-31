@@ -11,6 +11,7 @@ class GithubApiService {
 
   static const _baseUrl = 'https://api.github.com';
 
+  /// Searches GitHub repositories with pagination support.
   Future<List<Repository>> searchRepositories({
   required String query,
   int page = 1,
@@ -36,6 +37,7 @@ class GithubApiService {
         )
         .toList();
   } on DioException catch (error) {
+    // Handle GitHub rate limits separately
     if (error.response?.statusCode == 403 &&
         error.response?.headers.value('x-ratelimit-remaining') == '0') {
       throw const GithubException(
@@ -44,6 +46,7 @@ class GithubApiService {
       );
     }
 
+    // Convert connection failures into a network error.
     if (error.type == DioExceptionType.connectionError ||
         error.type == DioExceptionType.connectionTimeout ||
         error.type == DioExceptionType.receiveTimeout ||
@@ -66,6 +69,8 @@ class GithubApiService {
   }
 }
 
+
+  /// Loads the first five open issues for a repository.
   Future<List<Issue>> getOpenIssues({
   required String owner,
   required String repository,

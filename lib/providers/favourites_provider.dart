@@ -14,6 +14,7 @@ class FavouritesProvider extends ChangeNotifier {
   List<Repository> get favourites => List.unmodifiable(_favourites);
   bool get isLoading => _isLoading;
 
+  /// Loads saved favourites from local storage.
   Future<void> loadFavourites() async {
     _isLoading = true;
     notifyListeners();
@@ -24,12 +25,14 @@ class FavouritesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Checks whether a repository is currently favourited.
   bool isFavourite(Repository repository) {
     return _favourites.any(
       (item) => item.id == repository.id,
     );
   }
 
+  /// Adds or removes a repository from favourites.
   Future<void> toggleFavourite(Repository repository) async {
     if (isFavourite(repository)) {
       _favourites.removeWhere(
