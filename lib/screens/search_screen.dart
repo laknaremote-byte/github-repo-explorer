@@ -140,28 +140,46 @@ class _SearchScreenState extends State<SearchScreen> {
                     );
 
                   case SearchStatus.loaded:
-                    return ListView.builder(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                      ),
-                      itemCount: provider.repositories.length +
-                        (provider.isLoadingMore ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index == provider.repositories.length) {
-                          return const Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Center(
-                              child: CircularProgressIndicator(),
+                    return Column(
+                      children: [
+                        if (provider.isOffline)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
                             ),
-                          );
-                        }
-                        final repository = provider.repositories[index];
+                            child: const Text(
+                              'You are offline. Showing cached results.',
+                            ),
+                          ),
+                        Expanded(
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                            ),
+                            itemCount: provider.repositories.length +
+                                (provider.isLoadingMore ? 1 : 0),
+                            itemBuilder: (context, index) {
+                              if (index == provider.repositories.length) {
+                                return const Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                );
+                              }
 
-                        return RepositoryCard(
-                          repository: repository,
-                        );
-                      },
+                              final repository = provider.repositories[index];
+
+                              return RepositoryCard(
+                                repository: repository,
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     );
                 }
               },

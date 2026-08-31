@@ -15,8 +15,9 @@ void main() {
       providers: [
         ChangeNotifierProvider(
           create: (_) => SearchProvider(
+            storageService: LocalStorageService(), 
             apiService: githubApiService,
-          ),
+          )..loadCachedResultsIfOffline()
         ),
         ChangeNotifierProvider(
           create: (_) => FavouritesProvider(

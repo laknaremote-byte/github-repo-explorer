@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:github_repo_explorer/services/local_storage_service.dart';
 
 import '../models/repository.dart';
 import '../services/github_api_service.dart';
@@ -18,9 +20,14 @@ class SearchProvider extends ChangeNotifier {
   
   SearchProvider({
     required GithubApiService apiService,
-  }) : _apiService = apiService;
+    required LocalStorageService storageService
+  }) : _apiService = apiService,
+      _storageService = storageService;
 
   final GithubApiService _apiService;
+  final LocalStorageService _storageService;
+  final Connectivity _connectivity = Connectivity();
+
   static const int _pageSize = 20;
 
   List<Repository> _repositories = [];
@@ -31,6 +38,7 @@ class SearchProvider extends ChangeNotifier {
   int _currentPage = 1;
   bool _hasMore = true;
   bool _isLoadingMore = false;
+  bool _isOffline = false;
 
   List<Repository> get repositories => _repositories;
   String get query => _query;
@@ -38,6 +46,7 @@ class SearchProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get hasMore => _hasMore;
   bool get isLoadingMore => _isLoadingMore;
+  bool get isOffline => _isOffline;
 
 
   void search(String query) {
@@ -56,6 +65,7 @@ class SearchProvider extends ChangeNotifier {
 
     _query = trimmedQuery;
     _repositories = [];
+    _isOffline = false;
     _status = SearchStatus.loading;
     _errorMessage = null;
     notifyListeners();
@@ -77,14 +87,27 @@ class SearchProvider extends ChangeNotifier {
       );
 
       _repositories = results;
+
+      await _storageService.saveLastSearchResults(results);
+
+      _isOffline = false;
       _hasMore = results.length == _pageSize;
       _status = results.isEmpty
           ? SearchStatus.empty
           : SearchStatus.loaded;
     } catch (error) {
-      _status = SearchStatus.error;
-      _errorMessage = 'Unable to search GitHub repositories.';
-    }
+        final cachedResults =
+            await _storageService.loadLastSearchResults();
+
+        if (cachedResults.isNotEmpty) {
+          _repositories = cachedResults;
+          _isOffline = true;
+          _status = SearchStatus.loaded;
+        } else {
+          _status = SearchStatus.error;
+          _errorMessage = 'Unable to load repositories.';
+        }
+      }
 
     notifyListeners();
   }
@@ -116,6 +139,28 @@ class SearchProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> loadCachedResultsIfOffline() async {
+    final connectivityResults =
+        await _connectivity.checkConnectivity();
+
+    final isOffline = connectivityResults.every(
+      (result) => result == ConnectivityResult.none,
+    );
+
+    if (!isOffline) {
+      return;
+    }
+
+    final cachedResults =
+        await _storageService.loadLastSearchResults();
+
+    if (cachedResults.isNotEmpty) {
+      _repositories = cachedResults;
+      _isOffline = true;
+      _status = SearchStatus.loaded;
+      notifyListeners();
+    }
+  }
   @override
   void dispose() {
     _debounceTimer?.cancel();
