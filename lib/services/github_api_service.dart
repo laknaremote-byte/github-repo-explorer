@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:github_repo_explorer/models/issue.dart';
 
 import '../models/repository.dart';
 
@@ -33,4 +34,31 @@ class GithubApiService {
         )
         .toList();
   }
+
+  Future<List<Issue>> getOpenIssues({
+  required String owner,
+  required String repository,
+  }) async {
+    final response = await _dio.get(
+      '$_baseUrl/repos/$owner/$repository/issues',
+      queryParameters: {
+        'state': 'open',
+        'sort': 'updated',
+        'per_page': 10,
+      },
+    );
+
+    final items = response.data as List<dynamic>;
+
+    return items
+        .where(
+          (item) => !(item as Map<String, dynamic>).containsKey('pull_request'),
+        )
+        .map(
+          (item) => Issue.fromJson(
+            item as Map<String, dynamic>,
+          ),
+        )
+        .toList();
+      }
 }

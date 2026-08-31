@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:github_repo_explorer/screens/repository_detail_screen.dart';
 
 import '../models/repository.dart';
 
@@ -14,58 +15,70 @@ class RepositoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundImage: NetworkImage(
-                repository.ownerAvatarUrl,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => RepositoryDetailScreen(
+                repository: repository,
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    repository.fullName,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(
-                          fontWeight: FontWeight.bold,
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 24,
+                backgroundImage: NetworkImage(
+                  repository.ownerAvatarUrl,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      repository.fullName,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      repository.description ??
+                          'No description available.',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.star_border,
+                          size: 18,
                         ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    repository.description ??
-                        'No description available.',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.star_border,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 4),
-                      Text('${repository.stars}'),
-                      const SizedBox(width: 16),
-                      if (repository.language != null) ...[
+                        const SizedBox(width: 4),
+                        Text('${repository.stars}'),
                         const SizedBox(width: 16),
-                        Text(repository.language!),
+                        if (repository.language != null) ...[
+                          const SizedBox(width: 16),
+                          Text(repository.language!),
+                        ],
                       ],
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
