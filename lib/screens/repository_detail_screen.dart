@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:github_repo_explorer/models/issue.dart';
+import 'package:github_repo_explorer/providers/favourites_provider.dart';
 import 'package:github_repo_explorer/services/github_api_service.dart';
+import 'package:provider/provider.dart';
 
 import '../models/repository.dart';
 
@@ -39,6 +41,28 @@ class _RepositoryDetailScreenState
     return Scaffold(
       appBar: AppBar(
         title: const Text('Repository'),
+        actions: [
+          Consumer<FavouritesProvider>(
+            builder: (context, favouritesProvider, child) {
+              final isFavourite =
+                  favouritesProvider.isFavourite(widget.repository);
+
+              return IconButton(
+                onPressed: () {
+                  favouritesProvider.toggleFavourite(widget.repository);
+                },
+                icon: Icon(
+                  isFavourite
+                      ? Icons.favorite
+                      : Icons.favorite_border,
+                ),
+                tooltip: isFavourite
+                    ? 'Remove favourite'
+                    : 'Add favourite',
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
