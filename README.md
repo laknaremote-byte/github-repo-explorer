@@ -1,16 +1,118 @@
-# github_repo_explorer
+# GitHub Repo Explorer
 
-A new Flutter project.
+A Flutter application for searching public GitHub repositories, viewing repository details and open issues, and managing favourite repositories with offline support.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- Search public GitHub repositories
+- Debounced search input
+- Infinite scrolling with pagination
+- Repository details
+- Display the latest 5 open issues
+- Add and remove favourite repositories
+- Persist favourites across app restarts
+- View favourites while offline
+- Cache the last successful search results for offline use
+- Loading, empty, error, and offline states
+- GitHub API rate-limit handling
+- Light and dark mode based on the system setting
 
-A few resources to get you started if this is your first Flutter project:
+## Tech Stack
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Flutter / Dart** – Cross-platform application development
+- **Provider** – State management with clear separation between UI and business logic
+- **Dio** – HTTP client for GitHub API requests and error handling
+- **SharedPreferences** – Lightweight local persistence for favourites and cached search results
+- **connectivity_plus** – Detects offline state when the application starts
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Architecture
+
+The application follows a simple layered structure:
+
+UI
+│
+├── Screens
+└── Widgets
+      │
+      ▼
+State Management
+│
+└── Providers
+      │
+      ▼
+Services
+│
+├── GithubApiService
+└── LocalStorageService
+      │
+      ├── GitHub REST API
+      └── SharedPreferences
+
+
+## Setup
+
+### Requirements
+
+- Flutter 3.16+
+- Dart 3.x
+- Android Studio or Xcode for running on a device or emulator
+
+### Run the project
+
+```bash
+flutter pub get
+flutter run
+```
+## Screenshots
+
+### Search Results
+
+![Search Results](media/search.png)
+
+### Repository Details
+
+![Repository Details](media/details.png)
+
+### Open Issues
+
+![Open Issues](media/issues.png)
+
+### Favourites
+
+![Favourites](media/favourites.png)
+
+### Offline Mode
+
+![Offline Mode](media/offline.png)
+
+## Demo
+
+[Watch the demo recording](media/demo.mp4)
+
+### Trade-offs and Known Limitations
+
+- Only the latest successful search results are saved for offline use.
+- The search text is not saved with the cached results. This keeps the offline feature simple.
+- There is no retry or backoff when an API request fails.
+- Language filtering and sorting are not included.
+- Test coverage is limited because of the time available for the assessment.
+- The required widget test for the search flow was not completed within the available time.
+
+## What I Would Build Next
+
+With another 8 hours, I would focus on the following improvements:
+
+- Add language filtering and sorting by stars or recently updated repositories to make it easier to find relevant repositories.
+
+- Add pull-to-refresh so users can refresh the current search results.
+
+- Improve API reliability by adding retry and backoff for temporary network failures.
+
+- Improve offline support by showing when cached results were last updated and refreshing them when the device comes back online.
+
+- Add more repository information, such as topics, contributors, and pull requests.
+
+- Add GitHub Actions to run `flutter analyze` and tests automatically when changes are pushed.
+
+- Expand the test coverage to include the search flow, pagination, favourites, and offline behaviour.
+
