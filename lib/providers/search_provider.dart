@@ -21,7 +21,7 @@ class SearchProvider extends ChangeNotifier {
   }) : _apiService = apiService;
 
   final GithubApiService _apiService;
-  static const int _pageSize = 10;
+  static const int _pageSize = 20;
 
   List<Repository> _repositories = [];
   String _query = '';

@@ -13,7 +13,7 @@ class GithubApiService {
   Future<List<Repository>> searchRepositories({
     required String query,
     int page = 1,
-    int perPage = 10,
+    int perPage = 20,
   }) async {
     final response = await _dio.get(
       '$_baseUrl/search/repositories',
@@ -44,7 +44,7 @@ class GithubApiService {
       queryParameters: {
         'state': 'open',
         'sort': 'updated',
-        'per_page': 10,
+        'per_page': 5,
       },
     );
 
