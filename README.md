@@ -87,7 +87,7 @@ flutter run
 
 ## Demo
 
-[Watch the demo recording](media/demo.mp4)
+[Watch the demo recording](media/demo.mov)
 
 ### Trade-offs and Known Limitations
 
