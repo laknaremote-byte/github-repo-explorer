@@ -1,4 +1,4 @@
-# GitHub Repo Explorer
+# GitHub Repository Explorer
 
 A Flutter application for searching public GitHub repositories, viewing repository details and open issues, and managing favourite repositories with offline support.
 
