@@ -27,26 +27,7 @@ A Flutter application for searching public GitHub repositories, viewing reposito
 
 ## Architecture
 
-The application follows a simple layered structure:
-
-UI
-│
-├── Screens
-└── Widgets
-      │
-      ▼
-State Management
-│
-└── Providers
-      │
-      ▼
-Services
-│
-├── GithubApiService
-└── LocalStorageService
-      │
-      ├── GitHub REST API
-      └── SharedPreferences
+The app follows a simple layered structure. The UI layer contains screens and reusable widgets, while the Provider layer manages application state and business logic. The service layer handles communication with the GitHub REST API and local storage using SharedPreferences. Models are used to represent repository and issue data. This structure keeps the UI, business logic, and data handling separate and makes the code easier to maintain and test.
 
 
 ## Setup
